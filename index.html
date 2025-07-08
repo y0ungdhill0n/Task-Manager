@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Task Manager</title>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<h1>Task Manager</h1>
+		<form id="taskForm">
+			<input
+				type="text"
+				id="taskInput"
+				placeholder="Enter task name"
+				required />
+			<button type="submit">Add Task</button>
+		</form>
+		<input type="text" id="searchInput" placeholder="Search tasks..." />
+		<div id="filter-buttons">
+			<button onclick="filterTasks('all')">All</button>
+			<button onclick="filterTasks('pending')">Pending</button>
+			<button onclick="filterTasks('completed')">Completed</button>
+		</div>
+		<div id="taskList"></div>
+		<div id="errorMessage" class="error"></div>
+		<canvas id="taskChart"></canvas>
+		<div id="toast-container"></div>
+		<script src="script.js"></script>
+	</body>
+	<footer id="foot">Built with ❤️ by Aman Dhillon &copy 2025</footer>
+</html>
