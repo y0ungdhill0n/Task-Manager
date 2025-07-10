@@ -127,6 +127,22 @@ body {
         background: #2e8bc0;
     }
 
+    .task button:nth-of-type(2) {
+        background: #ffd966;
+        color: #2e3a59;
+    }
+    .task button:nth-of-type(2):hover {
+        background: #ffe699;
+    }
+
+    .task button:nth-of-type(3) {
+        background: #ff6384;
+        color: #fff;
+    }
+    .task button:nth-of-type(3):hover {
+        background: #d81e5b;
+    }
+
     .task button:last-of-type {
         background: #f6f8fa;
         color: #2e3a59;
@@ -226,4 +242,77 @@ body {
     font-size: 1.08rem;
     color: #2e3a59;
     letter-spacing: 1px;
+}
+
+.priority-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.category-tag {
+    background: #e3e9f0;
+    color: #2e3a59;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-size: 0.92em;
+}
+
+.due-date {
+    margin-left: 8px;
+    color: #2e8bc0;
+    font-size: 0.92em;
+}
+.due-date.overdue {
+    color: #d81e5b;
+    font-weight: bold;
+}
+
+body.dark-mode {
+    background: #23272f;
+    color: #f6f8fa;
+}
+body.dark-mode #taskList,
+body.dark-mode #foot,
+body.dark-mode .toast,
+body.dark-mode #taskChart {
+    background: #2e3440;
+    color: #f6f8fa;
+    border-color: #444c5e;
+}
+body.dark-mode .task {
+    background: #23272f;
+}
+body.dark-mode .category-tag {
+    background: #444c5e;
+    color: #fff;
+}
+body.dark-mode .due-date.overdue {
+    color: #ff6384;
+}
+
+@media (max-width: 600px) {
+    #taskList, #foot, #taskChart {
+        max-width: 98vw;
+        padding: 8px;
+    }
+    form#taskForm, #searchInput {
+        max-width: 98vw;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .task {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .task-buttons {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
 }

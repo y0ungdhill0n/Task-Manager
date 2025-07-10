@@ -14,6 +14,13 @@
 				id="taskInput"
 				placeholder="Enter task name"
 				required />
+			<select id="priorityInput">
+				<option value="High">🔥 High</option>
+				<option value="Medium" selected>Medium</option>
+				<option value="Low">Low</option>
+			</select>
+			<input type="date" id="dueDateInput" />
+			<input type="text" id="categoryInput" placeholder="Category/Tag" />
 			<button type="submit">Add Task</button>
 		</form>
 		<input type="text" id="searchInput" placeholder="Search tasks..." />
@@ -26,6 +33,11 @@
 		<div id="errorMessage" class="error"></div>
 		<canvas id="taskChart"></canvas>
 		<div id="toast-container"></div>
+		<button
+			id="darkModeToggle"
+			style="position: fixed; top: 20px; left: 20px; z-index: 1000">
+			🌙
+		</button>
 		<script src="script.js"></script>
 	</body>
 	<footer id="foot">Built with ❤️ by Aman Dhillon &copy 2025</footer>

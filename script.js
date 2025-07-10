@@ -22,11 +22,16 @@ const TaskManager = (function () {
 	}
 
 	return {
-		addTask(name, id = Date.now()) {
-			if (name.length < 3) {
+		addTask(
+			name,
+			id = Date.now(),
+			priority = 'Medium',
+			dueDate = '',
+			category = ''
+		) {
+			if (name.length < 3)
 				throw new Error('Task name must be at least 3 characters long');
-			}
-			tasks.push({ id, name, completed: false });
+			tasks.push({ id, name, completed: false, priority, dueDate, category });
 			saveTasks();
 		},
 		getTasks() {
@@ -49,6 +54,18 @@ const TaskManager = (function () {
 			const regex = new RegExp(pattern, 'i');
 			return tasks.filter((task) => regex.test(task.name));
 		},
+		editTask(id, newName) {
+			if (newName.length < 3)
+				throw new Error('Task name must be at least 3 characters long');
+			tasks = tasks.map((task) =>
+				task.id === id ? { ...task, name: newName } : task
+			);
+			saveTasks();
+		},
+		deleteTask(id) {
+			tasks = tasks.filter((task) => task.id !== id);
+			saveTasks();
+		},
 	};
 })();
 
@@ -60,10 +77,20 @@ function syncTaskInstances() {
 }
 
 // Prototypes and Inheritance: Task Constructor
-function Task(id, name, completed) {
+function Task(
+	id,
+	name,
+	completed,
+	priority = 'Medium',
+	dueDate = '',
+	category = ''
+) {
 	this.id = id;
 	this.name = name;
 	this.completed = completed;
+	this.priority = priority;
+	this.dueDate = dueDate;
+	this.category = category;
 }
 
 Task.prototype.toggleComplete = function () {
@@ -144,7 +171,19 @@ async function displayTasks(tasks) {
 		taskDiv.className = 'task';
 		taskDiv.innerHTML = `
   <span class="task-content" title="${task.name}">
-    ${task.name} - ${
+    <span class="priority-dot" style="background:${
+			priorityColors[task.priority] || '#ccc'
+		}"></span>
+    ${task.name} 
+    <span class="category-tag">${task.category || ''}</span>
+    <span class="due-date${
+			task.dueDate && new Date(task.dueDate) < new Date() && !task.completed
+				? ' overdue'
+				: ''
+		}">
+      ${task.dueDate ? '📅 ' + task.dueDate : ''}
+    </span>
+    - ${
 			task.instance && typeof task.instance.getStatus === 'function'
 				? task.instance.getStatus()
 				: task.completed
@@ -154,6 +193,8 @@ async function displayTasks(tasks) {
   </span>
   <span class="task-buttons">
     <button onclick="handleToggleTask(${task.id})">Toggle</button>
+    <button onclick="startEditTask(${task.id})">Edit</button>
+    <button onclick="handleDeleteTask(${task.id})">Delete</button>
     <button onclick="TaskManager.getTasks().find(t => t.id === ${
 			task.id
 		})?.instance?.displayInfo()">Log Info</button>
@@ -167,23 +208,23 @@ async function displayTasks(tasks) {
 document.getElementById('taskForm').addEventListener('submit', function (e) {
 	e.preventDefault();
 	const taskInput = document.getElementById('taskInput');
+	const priorityInput = document.getElementById('priorityInput');
+	const dueDateInput = document.getElementById('dueDateInput');
+	const categoryInput = document.getElementById('categoryInput');
 	const taskName = taskInput.value.trim();
+	const priority = priorityInput.value;
+	const dueDate = dueDateInput.value;
+	const category = categoryInput.value.trim();
 
 	if (taskName) {
 		try {
-			TaskManager.addTask(taskName);
-			const newTask = new Task(Date.now(), taskName, false);
-			const taskInManager = TaskManager.getTasks().find(
-				(t) => t.id === newTask.id
-			);
-			if (taskInManager) {
-				taskInManager.instance = newTask;
-			} else {
-				console.warn(`Task with id ${newTask.id} not found in TaskManager`);
-			}
+			TaskManager.addTask(taskName, Date.now(), priority, dueDate, category);
+			syncTaskInstances();
 			displayTasks(TaskManager.getTasks());
 			updateTaskChart();
 			taskInput.value = '';
+			dueDateInput.value = '';
+			categoryInput.value = '';
 			showToast('Task added!', 'success');
 		} catch (error) {
 			displayError(error.message);
@@ -269,4 +310,46 @@ function handleToggleTask(id) {
 	);
 }
 
+function handleDeleteTask(id) {
+	TaskManager.deleteTask(id);
+	syncTaskInstances();
+	displayTasks(TaskManager.getTasks());
+	updateTaskChart();
+	showToast('Task deleted!', 'warning');
+}
+
+function startEditTask(id) {
+	const tasks = TaskManager.getTasks();
+	const task = tasks.find((t) => t.id === id);
+	if (!task) return;
+
+	const newName = prompt('Edit task name:', task.name);
+	if (newName !== null) {
+		try {
+			TaskManager.editTask(id, newName.trim());
+			syncTaskInstances();
+			displayTasks(TaskManager.getTasks());
+			updateTaskChart();
+			showToast('Task updated!', 'success');
+		} catch (error) {
+			showToast(error.message, 'error');
+		}
+	}
+}
+
 window.addEventListener('DOMContentLoaded', initializeTasks);
+
+const priorityColors = {
+	High: '#ff6384',
+	Medium: '#ffd966',
+	Low: '#36a2eb',
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+	const darkModeBtn = document.getElementById('darkModeToggle');
+	if (darkModeBtn) {
+		darkModeBtn.addEventListener('click', function () {
+			document.body.classList.toggle('dark-mode');
+		});
+	}
+});
